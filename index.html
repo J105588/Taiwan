@@ -39,11 +39,9 @@
             justify-content: center;
             align-items: center;
             transition: opacity 1.5s ease-out;
-            /* 透明になったらクリックを透過させる（重要） */
             pointer-events: auto; 
         }
         
-        /* フェードアウト用のクラス */
         #intro-overlay.fade-out {
             opacity: 0;
             pointer-events: none;
@@ -63,24 +61,11 @@
             padding: 40px 20px;
         }
 
-        .intro-sub {
-            color: #fff;
-            margin-right: 20px;
-            font-size: 1.2rem;
-            writing-mode: vertical-rl;
-            opacity: 0;
-            animation: fadeIn 2s ease forwards 1.5s;
-        }
-
         @keyframes introAnim {
             0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(10px); }
             20% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
             80% { opacity: 1; transform: scale(1); }
             100% { opacity: 0; transform: scale(1.2); filter: blur(5px); }
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
         }
 
         /* --- メインコンテンツ --- */
@@ -190,20 +175,29 @@
     </div>
 
     <script>
-        // オープニング処理の修正版
+        // オープニング制御のグローバル変数
+        let baseAnimationDelay = 4.0; // デフォルトは4秒待つ
+
+        // ページ読み込み時の処理
         window.addEventListener('load', () => {
             const overlay = document.getElementById('intro-overlay');
-            
-            // 3.5秒後にフェードアウト開始
-            setTimeout(() => {
-                overlay.classList.add('fade-out'); // CSSクラスで透明にする
-                
-                // フェードアウト完了時間（1.5秒）を待ってからDOMから消す
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 1500); 
+            const hasPlayed = sessionStorage.getItem('introPlayed_v1'); // 再生済みフラグを確認
 
-            }, 3500);
+            if (hasPlayed) {
+                // --- 2回目以降のアクセス（即非表示） ---
+                overlay.style.display = 'none';
+                baseAnimationDelay = 0.2; // カード表示の待ち時間をほぼゼロに
+            } else {
+                // --- 初回アクセス（アニメーション実行） ---
+                sessionStorage.setItem('introPlayed_v1', 'true'); // フラグをセット
+                
+                setTimeout(() => {
+                    overlay.classList.add('fade-out');
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 1500); 
+                }, 3500);
+            }
         });
 
         // 蛍エフェクト
@@ -231,7 +225,6 @@
                 rows.forEach((row, index) => {
                     if (!row.trim()) return;
                     
-                    // 改良版CSVパースロジック
                     const cols = [];
                     let current = '';
                     let inQuote = false;
@@ -246,8 +239,10 @@
                     
                     const card = document.createElement('div');
                     card.className = 'card';
-                    // オープニング終了(5秒後)に合わせてカードを表示
-                    card.style.animationDelay = `${4.0 + (index * 0.15)}s`;
+                    
+                    // ★重要: グローバル変数 baseAnimationDelay を使って遅延時間を決定
+                    // 初回なら4秒〜、2回目なら0.2秒〜 になる
+                    card.style.animationDelay = `${baseAnimationDelay + (index * 0.15)}s`;
 
                     card.onclick = () => window.location.href = `detail.html?id=${clean[0]}`;
                     card.innerHTML = `
@@ -268,4 +263,3 @@
     </script>
 </body>
 </html>
-
