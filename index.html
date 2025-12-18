@@ -3,413 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>台湾修学旅行 探究の栞</title>
-    
-    <!-- 必要なライブラリ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.29/dist/lenis.min.js"></script>
-
-    <!-- フォント -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet">
-
+    <title>修学旅行 in 台湾 - 冒険のしおり</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Yuji+Syuku&display=swap');
+
         :root {
-            --c-crimson: #6A1B29; /* 深紅（落ち着いた色味） */
-            --c-gold: #BFA46F;    /* シャンパンゴールド */
-            --c-jade: #2E5C55;    /* 深い翡翠色 */
-            --c-black: #1a1a1a;
-            --c-text: #2c2c2c;
-            --c-bg: #F4F1EA;      /* 生成り色 */
-            --font-main: 'Shippori Mincho', serif;
-            --font-serif: 'Noto Serif JP', serif;
+            --primary: #8B0000; /* 深紅 */
+            --accent: #FFD700; /* 金 */
+            --bg: #1a1a1a;
+            --text: #f0f0f0;
         }
 
-        /* --- 基本設定 --- */
         body {
+            font-family: 'Noto Serif JP', serif;
+            background-color: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 0;
-            background-color: var(--c-bg);
-            color: var(--c-text);
-            font-family: var(--font-main);
             overflow-x: hidden;
-            /* 紙の質感をオーバーレイ */
-            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            background-image: radial-gradient(#333 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        h1, h2, h3 { font-weight: 500; margin: 0; }
-        p { line-height: 2.2; letter-spacing: 0.05em; color: #4a4a4a; }
-
-        /* --- ローダー --- */
-        .loader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100vh;
-            background: var(--c-crimson);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--c-gold);
-        }
-        .loader-text {
-            font-family: var(--font-serif);
-            font-size: 1.2rem;
-            letter-spacing: 0.5em;
-            opacity: 0;
-        }
-
-        /* --- ヒーローセクション --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* ヘッダー装飾（ランタン） */
+        .header {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(to bottom, #000, var(--primary));
+            border-bottom: 5px solid var(--accent);
             position: relative;
             overflow: hidden;
         }
 
-        .hero-bg {
+        .lanterns {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #ffffff 0%, var(--c-bg) 100%);
-            z-index: -1;
-        }
-
-        /* 縦書きタイトル */
-        .tategaki-box {
-            writing-mode: vertical-rl;
+            top: 0;
+            width: 100%;
             display: flex;
-            align-items: center;
-            gap: 2rem;
-            height: 60vh;
+            justify-content: space-around;
+            pointer-events: none;
         }
 
-        .hero-title {
+        .lantern {
+            width: 60px;
+            height: 80px;
+            background: #ff4d4d;
+            border-radius: 20px;
+            position: relative;
+            animation: swing 3s infinite ease-in-out alternate;
+            box-shadow: 0 10px 30px rgba(255, 77, 77, 0.6);
+        }
+        
+        .lantern::before {
+            content: "福";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: gold;
+            font-family: 'Yuji Syuku', serif;
+            font-size: 2rem;
+        }
+
+        .lantern::after {
+            content: "";
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 20px;
+            background: gold;
+        }
+
+        @keyframes swing {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        h1 {
+            font-family: 'Yuji Syuku', serif;
             font-size: 4rem;
-            color: var(--c-black);
-            letter-spacing: 0.2em;
-            border-left: 1px solid var(--c-crimson);
-            padding-left: 2rem;
+            color: var(--accent);
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            margin: 0;
+            position: relative;
+            z-index: 1;
         }
 
-        .hero-sub {
-            font-size: 1rem;
-            color: var(--c-jade);
+        p.subtitle {
+            font-size: 1.2rem;
+            margin-top: 10px;
             letter-spacing: 0.3em;
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            opacity: 0.6;
-        }
-        .scroll-line {
-            width: 1px;
-            height: 60px;
-            background: var(--c-crimson);
+        /* メインコンテンツ */
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
         }
 
-        /* --- 本日の言葉セクション --- */
-        .phrase-section {
-            padding: 100px 10%;
-            text-align: center;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            background: #fff;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
-        .phrase-box {
-            display: inline-block;
-            border: 1px solid var(--c-gold);
-            padding: 40px 60px;
+
+        .card {
+            background: #2a2a2a;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
             position: relative;
         }
-        .phrase-box::before {
-            content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
-            border: 1px solid var(--c-gold); opacity: 0.5;
-        }
-        .phrase-label { font-size: 0.8rem; color: var(--c-jade); letter-spacing: 0.2em; margin-bottom: 20px; display: block; }
-        .phrase-word { font-size: 2.5rem; font-family: var(--font-serif); color: var(--c-crimson); margin-bottom: 10px; display: block; }
-        .phrase-mean { font-size: 1rem; color: #666; }
 
-        /* --- スポット紹介エリア --- */
-        .spots-wrapper {
-            padding: 100px 5%;
-            max-width: 1200px;
-            margin: 0 auto;
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
         }
 
-        .spot-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 150px;
-            gap: 5%;
-            opacity: 0; /* JSで制御 */
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            filter: sepia(30%);
+            transition: filter 0.3s;
+        }
+
+        .card:hover .card-img {
+            filter: sepia(0%);
+        }
+
+        .card-content {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .card h2 {
+            font-family: 'Yuji Syuku', serif;
+            color: var(--accent);
+            margin: 0 0 10px 0;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
         
-        /* 偶数番目のレイアウト反転 */
-        .spot-row.reverse {
-            flex-direction: row-reverse;
-        }
-
-        .spot-image-area {
-            flex: 1;
-            height: 400px;
-            position: relative;
-            overflow: hidden;
-            background: #ddd;
-        }
-
-        /* パララックス用画像 */
-        .spot-img {
-            width: 100%;
-            height: 120%; /* スクロールで動かすため大きく */
-            object-fit: cover;
-            position: absolute;
-            top: -10%;
-            left: 0;
-            filter: sepia(20%) contrast(90%);
-        }
-
-        .spot-text-area {
-            flex: 1;
-            padding: 20px;
-        }
-
-        .spot-cat {
-            color: var(--c-gold);
+        .tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
             font-size: 0.8rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
-        .spot-name {
-            font-size: 2.5rem;
-            font-family: var(--font-serif);
-            color: var(--c-crimson);
-            margin-bottom: 30px;
-            line-height: 1.2;
-        }
-
-        .spot-desc {
-            font-size: 1rem;
-            margin-bottom: 30px;
-            text-align: justify;
-        }
-
-        .spot-meta {
-            display: grid;
-            grid-template-columns: 100px 1fr;
-            gap: 15px;
-            font-size: 0.9rem;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 20px;
-        }
-        .meta-label { color: var(--c-jade); font-weight: bold; }
-
-        /* --- フッター --- */
-        footer {
+        .loading {
             text-align: center;
-            padding: 80px 0;
-            background: var(--c-black);
-            color: var(--c-gold);
-            font-size: 0.8rem;
-            letter-spacing: 0.2em;
-        }
-
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .tategaki-box { writing-mode: horizontal-tb; flex-direction: column; height: auto; padding-top: 100px; }
-            .hero-title { border-left: none; border-bottom: 1px solid var(--c-crimson); padding-bottom: 20px; padding-left: 0; font-size: 2.5rem; }
-            .spot-row, .spot-row.reverse { flex-direction: column; margin-bottom: 100px; }
-            .spot-image-area { width: 100%; height: 250px; margin-bottom: 30px; }
-            .phrase-box { padding: 30px 20px; width: 80%; }
+            font-size: 2rem;
+            color: var(--accent);
+            padding: 50px;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- ローディング演出 -->
-    <div class="loader">
-        <div class="loader-text">修学旅行 台湾探究</div>
+    <div class="header">
+        <div class="lanterns">
+            <div class="lantern" style="animation-delay: 0s;"></div>
+            <div class="lantern" style="animation-delay: 1s;"></div>
+            <div class="lantern" style="animation-delay: 0.5s;"></div>
+            <div class="lantern" style="animation-delay: 1.5s;"></div>
+        </div>
+        <h1>台湾探索</h1>
+        <p class="subtitle">伝統と混沌が交差する修学旅行のしおり</p>
     </div>
 
-    <!-- ヒーローエリア -->
-    <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="tategaki-box">
-            <div class="hero-sub">令和七年度 海外研修</div>
-            <h1 class="hero-title">台湾<br>文化探究</h1>
-            <div class="hero-sub">伝統と革新の交差</div>
+    <div class="container">
+        <div id="spot-grid" class="grid">
+            <div class="loading">データを読み込み中...</div>
         </div>
-        <div class="scroll-indicator">
-            <span style="font-size: 0.7rem; letter-spacing: 0.2em;">SCROLL</span>
-            <div class="scroll-line"></div>
-        </div>
-    </section>
-
-    <!-- 機能：本日の言葉（教養） -->
-    <section class="phrase-section">
-        <div class="phrase-box">
-            <span class="phrase-label">Traveler's Phrase</span>
-            <span class="phrase-word" id="phrase-word">你好</span>
-            <span class="phrase-mean" id="phrase-mean">まずは、挨拶から始めよう。</span>
-            <button onclick="changePhrase()" style="margin-top:20px; background:none; border:none; border-bottom:1px solid var(--c-crimson); cursor:pointer; font-family:var(--font-main); color:var(--c-crimson);">言葉を変える</button>
-        </div>
-    </section>
-
-    <!-- スポット一覧 -->
-    <div class="spots-wrapper" id="spots-container">
-        <!-- JSでここに注入 -->
     </div>
-
-    <footer>
-        <p>Taiwan School Trip Guidebook</p>
-        <p>Design for Learning & Discovery</p>
-    </footer>
 
     <script>
-        // --- 1. スムーススクロール (Lenis) ---
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            direction: 'vertical',
-            smooth: true
-        });
+        async function loadCSV() {
+            try {
+                const response = await fetch('spots.csv');
+                const data = await response.text();
+                const rows = data.split('\n').slice(1); // ヘッダー除去
+                const grid = document.getElementById('spot-grid');
+                grid.innerHTML = '';
 
-        function raf(time) {
-            lenis.raf(time);
-            requestAnimationFrame(raf);
-        }
-        requestAnimationFrame(raf);
+                rows.forEach(row => {
+                    if (!row.trim()) return;
+                    // 簡易的なCSVパース（カンマ区切り、引用符なし前提）
+                    // 実際の運用ではライブラリ(PapaParse等)推奨
+                    const cols = row.split(',');
+                    const id = cols[0];
+                    const name = cols[1];
+                    const category = cols[2];
+                    const catchphrase = cols[3];
+                    const photo = cols[7] || 'https://via.placeholder.com/300';
 
-        // --- 2. 台湾華語（学習用） ---
-        const phrases = [
-            { w: "你好 (Nǐ hǎo)", m: "こんにちは。すべての対話の始まり。" },
-            { w: "謝謝 (Xiè xie)", m: "ありがとう。感謝の心は万国共通。" },
-            { w: "請問 (Qǐng wèn)", m: "お尋ねします。道を尋ねる際のマナー。" },
-            { w: "不好意思 (Bù hǎo yì si)", m: "すみません。謙虚さと気遣いの言葉。" },
-            { w: "多謝款待 (Duō xiè kuǎn dài)", m: "ごちそうさまでした。食への敬意。" }
-        ];
-
-        function changePhrase() {
-            const w = document.getElementById('phrase-word');
-            const m = document.getElementById('phrase-mean');
-            
-            gsap.to([w, m], { opacity: 0, y: -10, duration: 0.3, onComplete: () => {
-                const rand = phrases[Math.floor(Math.random() * phrases.length)];
-                w.innerText = rand.w;
-                m.innerText = rand.m;
-                gsap.to([w, m], { opacity: 1, y: 0, duration: 0.5 });
-            }});
-        }
-
-        // --- 3. CSV読み込みとアニメーション構築 ---
-        const csvPath = 'spots.csv';
-
-        // プレースホルダー画像（本来は各スポットの写真を使用推奨）
-        // ここでは「台湾っぽい」フリー素材URLをダミーとして使用
-        const dummyImages = [
-            "https://images.unsplash.com/photo-1470004914212-05527e49370b?q=80&w=1000&auto=format&fit=crop", // 九份
-            "https://images.unsplash.com/photo-1599576781498-8c1762c2f74a?q=80&w=1000&auto=format&fit=crop", // 故宮（イメージ）
-            "https://images.unsplash.com/photo-1534450539313-6abd1244d567?q=80&w=1000&auto=format&fit=crop", // 夜市
-            "https://images.unsplash.com/photo-1571474004502-c1824d693245?q=80&w=1000&auto=format&fit=crop", // 寺院
-            "https://images.unsplash.com/photo-1594950669299-a8647035f29d?q=80&w=1000&auto=format&fit=crop"  // 101
-        ];
-
-        Papa.parse(csvPath, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                const container = document.getElementById('spots-container');
-                
-                // ローディング終了処理
-                const tl = gsap.timeline();
-                tl.to(".loader-text", { opacity: 1, duration: 1 })
-                  .to(".loader", { height: 0, duration: 1, ease: "power4.inOut" }, "+=0.5");
-
-                results.data.forEach((row, index) => {
-                    if (!row.name) return;
-
-                    const isReverse = index % 2 !== 0 ? 'reverse' : '';
-                    const imgUrl = dummyImages[index % dummyImages.length];
-
-                    const html = `
-                        <div class="spot-row ${isReverse} spot-row-${index}">
-                            <div class="spot-image-area">
-                                <img src="${imgUrl}" class="spot-img spot-img-${index}" alt="${row.name}">
-                            </div>
-                            <div class="spot-text-area">
-                                <span class="spot-cat">${row.category}</span>
-                                <h2 class="spot-name">${row.name}</h2>
-                                <p class="spot-desc">${row.description}</p>
-                                <div class="spot-meta">
-                                    <span class="meta-label">名物</span>
-                                    <span>${row.food}</span>
-                                    <span class="meta-label">探究</span>
-                                    <span>${row.tips}</span>
-                                    <span class="meta-label">注意</span>
-                                    <span>${row.note}</span>
-                                </div>
-                            </div>
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => window.location.href = `detail.html?id=${id}`;
+                    card.innerHTML = `
+                        <img src="${photo}" class="card-img" alt="${name}">
+                        <div class="card-content">
+                            <span class="tag">${category}</span>
+                            <h2>${name}</h2>
+                            <p>${catchphrase}</p>
                         </div>
                     `;
-                    container.innerHTML += html;
+                    grid.appendChild(card);
                 });
-
-                // DOM生成後にScrollTriggerを設定
-                setTimeout(() => {
-                    results.data.forEach((row, index) => {
-                        if (!row.name) return;
-                        
-                        // 1. 行全体のフェードイン
-                        gsap.fromTo(`.spot-row-${index}`, 
-                            { opacity: 0, y: 50 },
-                            {
-                                scrollTrigger: {
-                                    trigger: `.spot-row-${index}`,
-                                    start: "top 80%",
-                                    toggleActions: "play none none reverse"
-                                },
-                                opacity: 1,
-                                y: 0,
-                                duration: 1,
-                                ease: "power3.out"
-                            }
-                        );
-
-                        // 2. 画像のパララックス効果
-                        // コンテナの中で画像がゆっくり動く
-                        gsap.to(`.spot-img-${index}`, {
-                            scrollTrigger: {
-                                trigger: `.spot-image-area`, 
-                                start: "top bottom",
-                                end: "bottom top",
-                                scrub: true
-                            },
-                            y: "20%", // 上下に動く幅
-                            ease: "none"
-                        });
-                    });
-                }, 100);
-            },
-            error: function() {
-                alert("CSV読み込みエラー：サーバー環境（VS Code Live Server等）で実行してください");
-                document.querySelector(".loader").style.display = "none";
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('spot-grid').innerHTML = '<p>データの読み込みに失敗しました。</p>';
             }
-        });
+        }
 
+        window.onload = loadCSV;
     </script>
 </body>
 </html>
