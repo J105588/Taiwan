@@ -19,26 +19,40 @@
             color: var(--ink);
             font-family: 'Shippori Mincho', serif;
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* 巻物の外枠 */
+        .scroll-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+            position: relative;
+            /* 巻物が縦に開くアニメーション */
+            animation: unfoldScroll 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transform-origin: top center;
+            opacity: 0;
+        }
+
+        @keyframes unfoldScroll {
+            0% { transform: scaleY(0.1); opacity: 0; }
+            100% { transform: scaleY(1); opacity: 1; }
         }
 
         .scroll-container {
-            max-width: 900px;
-            margin: 0 auto;
             background: var(--paper-bg);
             padding: 60px 80px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            border-top: 20px solid var(--border);
-            border-bottom: 20px solid var(--border);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.7);
+            border-top: 30px solid var(--border);
+            border-bottom: 30px solid var(--border);
             position: relative;
-            min-height: 80vh;
+            overflow: hidden; /* スタンプなどのあふれ防止 */
         }
 
         /* 戻るボタン */
         .back-btn {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 20px; left: 20px;
             background: var(--border);
             color: white;
             padding: 10px 20px;
@@ -47,27 +61,32 @@
             z-index: 100;
             font-weight: bold;
             transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .back-btn:hover { background: #a0522d; }
+        .back-btn:hover { background: #a0522d; transform: translateX(-5px); }
 
-        /* デザイン装飾 */
+        /* 必見スタンプ（派手に登場） */
         .stamp {
             position: absolute;
-            top: 40px;
-            right: 40px;
-            width: 100px;
-            height: 100px;
-            border: 3px solid var(--stamp-color);
+            top: 50px; right: 50px;
+            width: 120px; height: 120px;
+            border: 4px solid var(--stamp-color);
             border-radius: 50%;
             color: var(--stamp-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-family: 'Yuji Syuku', serif;
-            font-size: 1.5rem;
-            transform: rotate(-15deg);
-            opacity: 0.8;
-            mask-image: url('https://www.transparenttextures.com/patterns/grunge-wall.png'); /* かすれ表現 */
+            font-size: 1.8rem;
+            opacity: 0;
+            mask-image: url('https://www.transparenttextures.com/patterns/grunge-wall.png');
+            z-index: 10;
+            /* バンッ！と押されるアニメーション */
+            animation: stampSlam 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.2s; /* 巻物が開いた後に実行 */
+        }
+
+        @keyframes stampSlam {
+            0% { transform: scale(5) rotate(20deg); opacity: 0; }
+            80% { transform: scale(0.9) rotate(-20deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-15deg); opacity: 0.8; }
         }
 
         h1 {
@@ -77,17 +96,24 @@
             border-bottom: 2px solid var(--ink);
             padding-bottom: 20px;
             margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeInText 1s ease forwards 0.5s;
         }
 
         .hero-img {
-            width: 100%;
-            height: 400px;
+            width: 100%; height: 400px;
             object-fit: cover;
             border: 5px double var(--ink);
             margin-bottom: 40px;
+            opacity: 0;
+            transform: scale(0.95);
+            animation: zoomInImg 1.5s ease forwards 0.8s;
         }
 
-        /* 詳細グリッド */
+        @keyframes fadeInText { to { opacity: 1; } }
+        @keyframes zoomInImg { to { opacity: 1; transform: scale(1); } }
+
+        /* セクション（スクロール時にふわっと表示させる） */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 2fr;
@@ -99,26 +125,35 @@
             border: 1px solid var(--ink);
             padding: 20px;
             position: relative;
+            background: rgba(255,255,255,0.5);
+            
+            /* スクロールアニメーション用初期状態 */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        /* JSでクラスが付与されたら表示 */
+        .section-box.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .section-box h3 {
             position: absolute;
-            top: -15px;
-            left: 10px;
+            top: -15px; left: 10px;
             background: var(--paper-bg);
-            padding: 0 10px;
-            margin: 0;
+            padding: 0 10px; margin: 0;
             font-family: 'Yuji Syuku', serif;
             color: var(--border);
+            font-size: 1.3rem;
         }
 
-        .full-width {
-            grid-column: 1 / -1;
-        }
+        .full-width { grid-column: 1 / -1; }
 
         .vertical-text {
             writing-mode: vertical-rl;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             line-height: 2;
             height: 300px;
             text-align: justify;
@@ -127,23 +162,28 @@
         .highlight {
             background: linear-gradient(transparent 60%, #ffeb3b 60%);
             font-weight: bold;
+            padding: 0 5px;
         }
 
-        /* 面白い機能：トリビアボタン */
+        /* トリビアボタン */
         .trivia-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: var(--ink);
-            color: white;
-            text-align: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-top: 30px;
-            border: none;
+            display: block; width: 100%; padding: 15px;
+            background: var(--ink); color: white;
+            text-align: center; font-size: 1.2rem;
+            cursor: pointer; margin-top: 30px; border: none;
             transition: 0.3s;
+            position: relative; overflow: hidden;
         }
-        .trivia-btn:hover { background: #444; }
+        
+        .trivia-btn::after {
+            content: "";
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .trivia-btn:hover::after { left: 100%; }
         
         .trivia-content {
             display: none;
@@ -151,6 +191,12 @@
             background: #eee;
             border: 1px dashed var(--ink);
             margin-top: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
     </style>
@@ -159,49 +205,51 @@
 
     <a href="index.html" class="back-btn">← 一覧に戻る</a>
 
-    <div class="scroll-container">
-        <div class="stamp">必見<br>スポット</div>
-        
-        <h1 id="detail-name">読み込み中...</h1>
-        <img id="detail-img" src="" class="hero-img" alt="">
+    <div class="scroll-wrapper">
+        <div class="scroll-container">
+            <div class="stamp">必見<br>スポット</div>
+            
+            <h1 id="detail-name">Data Loading...</h1>
+            <img id="detail-img" src="" class="hero-img" alt="">
 
-        <div class="info-grid">
-            <!-- 概要 -->
-            <div class="section-box full-width">
-                <h3>解説</h3>
-                <p id="detail-desc" style="font-size: 1.1rem; line-height: 1.8;"></p>
-            </div>
+            <div class="info-grid">
+                <!-- 概要 -->
+                <div class="section-box full-width scroll-trigger">
+                    <h3>解説</h3>
+                    <p id="detail-desc" style="font-size: 1.1rem; line-height: 1.8;"></p>
+                </div>
 
-            <!-- 歴史（縦書きで雰囲気出し） -->
-            <div class="section-box">
-                <h3>歴史的背景</h3>
-                <div id="detail-history" class="vertical-text">
-                    <!-- JSで挿入 -->
+                <!-- 歴史（縦書き） -->
+                <div class="section-box scroll-trigger" style="transition-delay: 0.2s;">
+                    <h3>歴史的背景</h3>
+                    <div id="detail-history" class="vertical-text">
+                        <!-- JSで挿入 -->
+                    </div>
+                </div>
+
+                <!-- 攻略情報 -->
+                <div class="section-box scroll-trigger" style="transition-delay: 0.4s;">
+                    <h3>攻略データ解析</h3>
+                    <ul style="list-style: square; padding-left: 20px; line-height: 2;">
+                        <li><strong>カテゴリ:</strong> <span id="detail-category"></span></li>
+                        <li><strong>必食グルメ:</strong> <span id="detail-food" class="highlight"></span></li>
+                        <li><strong>キャッチコピー:</strong> <span id="detail-catch"></span></li>
+                    </ul>
+                    <hr style="border-top: 1px dashed var(--ink); margin: 20px 0;">
+                    <p style="font-size: 0.9rem;">
+                        <em>※この場所での注意事項：スリに注意。臭豆腐の匂いは服につくと取れない。</em>
+                    </p>
                 </div>
             </div>
 
-            <!-- 攻略情報 -->
-            <div class="section-box">
-                <h3>攻略データ解析</h3>
-                <ul style="list-style: square; padding-left: 20px; line-height: 2;">
-                    <li><strong>カテゴリ:</strong> <span id="detail-category"></span></li>
-                    <li><strong>必食グルメ:</strong> <span id="detail-food" class="highlight"></span></li>
-                    <li><strong>キャッチコピー:</strong> <span id="detail-catch"></span></li>
-                </ul>
-                <hr style="border-top: 1px dashed var(--ink); margin: 20px 0;">
-                <p style="font-size: 0.9rem;">
-                    <em>※この場所での注意事項：スリに注意。臭豆腐の匂いは服につくと取れない。</em>
-                </p>
+            <!-- インタラクティブ要素 -->
+            <button class="trivia-btn scroll-trigger" onclick="toggleTrivia()">㊙️ 現地ガイドも知らない（かもしれない）極秘情報</button>
+            <div id="trivia-box" class="trivia-content">
+                <strong>「実は、この場所のトイレは非常に混むため、手前の駅で済ませておくのがプロの技である。」</strong><br>
+                （※これはサンプルテキストです。実際にはここにもCSVデータを入れることができます）
             </div>
-        </div>
 
-        <!-- インタラクティブ要素 -->
-        <button class="trivia-btn" onclick="toggleTrivia()">㊙️ 現地ガイドも知らない（かもしれない）極秘情報</button>
-        <div id="trivia-box" class="trivia-content">
-            ここにはランダムな面白い豆知識が表示されます（実際にはCSVにカラムを追加して制御も可能ですが、今回はジョークとして固定表示）。<br><br>
-            <strong>「実は、この場所のトイレは非常に混むため、手前の駅で済ませておくのがプロの技である。」</strong>
         </div>
-
     </div>
 
     <script>
@@ -210,8 +258,22 @@
             box.style.display = box.style.display === 'block' ? 'none' : 'block';
         }
 
+        // スクロール時のアニメーション発火監視
+        function setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 }); // 10%見えたら発火
+
+            document.querySelectorAll('.scroll-trigger').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
         async function loadDetail() {
-            // URLパラメータからIDを取得
             const urlParams = new URLSearchParams(window.location.search);
             const spotId = urlParams.get('id');
 
@@ -226,26 +288,24 @@
                 const data = await response.text();
                 const rows = data.split('\n').slice(1);
                 
-                // IDで該当行を検索
+                // 検索
                 const spotRow = rows.find(row => row.startsWith(spotId + ','));
 
                 if (spotRow) {
-                    // CSVパース（簡易版）
-                    // データ内にカンマが含まれる場合は正規表現でパースが必要
-                    // ここでは単純なsplitを使用
+                     // 簡易パース（ダブルクォート対応）
                     const cols = spotRow.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || spotRow.split(',');
-                    // 注意: 上記正規表現は簡易的なものです。複雑なCSVにはPapaParse等のライブラリを使ってください。
-                    // 今回提供したsimpleなcsvなら .split(',') でも動作します。
-                    
-                    const simpleCols = spotRow.split(',');
+                    const cleanCols = cols.map(c => c.replace(/^"|"$/g, '')); // クォート削除
 
-                    document.getElementById('detail-name').innerText = simpleCols[1];
-                    document.getElementById('detail-category').innerText = simpleCols[2];
-                    document.getElementById('detail-catch').innerText = simpleCols[3];
-                    document.getElementById('detail-desc').innerText = simpleCols[4];
-                    document.getElementById('detail-history').innerText = simpleCols[5];
-                    document.getElementById('detail-food').innerText = simpleCols[6];
-                    document.getElementById('detail-img').src = simpleCols[7];
+                    document.getElementById('detail-name').innerText = cleanCols[1];
+                    document.getElementById('detail-category').innerText = cleanCols[2];
+                    document.getElementById('detail-catch').innerText = cleanCols[3];
+                    document.getElementById('detail-desc').innerText = cleanCols[4];
+                    document.getElementById('detail-history').innerText = cleanCols[5];
+                    document.getElementById('detail-food').innerText = cleanCols[6];
+                    document.getElementById('detail-img').src = cleanCols[7];
+
+                    // データセット完了後にObserverを開始
+                    setTimeout(setupIntersectionObserver, 100);
                 } else {
                     document.querySelector('.scroll-container').innerHTML = '<h2>データが見つかりません</h2>';
                 }
