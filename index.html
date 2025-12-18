@@ -8,9 +8,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Yuji+Syuku&display=swap');
 
         :root {
-            --primary: #8B0000; /* 深紅 */
-            --accent: #FFD700; /* 金 */
-            --bg: #1a1a1a;
+            --primary: #8B0000;
+            --accent: #FFD700;
+            --bg: #111; /* より暗くして光を目立たせる */
             --text: #f0f0f0;
         }
 
@@ -21,23 +21,51 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
-            background-image: radial-gradient(#333 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: radial-gradient(#222 1px, transparent 1px);
+            background-size: 30px 30px;
+            position: relative;
         }
 
-        /* ヘッダー装飾（ランタン） */
+        /* 蛍のエフェクト背景 */
+        #fireflies {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .firefly {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700;
+            animation: fly 10s linear infinite;
+        }
+
+        @keyframes fly {
+            0% { transform: translateY(110vh) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: translateY(100vh) scale(1); }
+            90% { opacity: 1; transform: translateY(-10vh) scale(1); }
+            100% { transform: translateY(-20vh) scale(0); opacity: 0; }
+        }
+
+        /* ヘッダー装飾 */
         .header {
             text-align: center;
-            padding: 80px 20px;
-            background: linear-gradient(to bottom, #000, var(--primary));
-            border-bottom: 5px solid var(--accent);
+            padding: 100px 20px 60px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(139, 0, 0, 0.3));
+            border-bottom: 3px solid var(--accent);
             position: relative;
+            z-index: 2;
             overflow: hidden;
         }
 
         .lanterns {
             position: absolute;
-            top: 0;
+            top: -10px;
             width: 100%;
             display: flex;
             justify-content: space-around;
@@ -50,136 +78,142 @@
             background: #ff4d4d;
             border-radius: 20px;
             position: relative;
-            animation: swing 3s infinite ease-in-out alternate;
-            box-shadow: 0 10px 30px rgba(255, 77, 77, 0.6);
+            animation: swing 4s infinite ease-in-out alternate;
+            box-shadow: 0 10px 40px rgba(255, 77, 77, 0.5);
+            transform-origin: top center;
         }
         
         .lantern::before {
             content: "福";
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             color: gold;
             font-family: 'Yuji Syuku', serif;
             font-size: 2rem;
         }
-
         .lantern::after {
             content: "";
             position: absolute;
-            bottom: -20px;
-            left: 50%;
+            bottom: -20px; left: 50%;
             transform: translateX(-50%);
-            width: 4px;
-            height: 20px;
+            width: 4px; height: 20px;
             background: gold;
         }
 
         @keyframes swing {
-            from { transform: rotate(-5deg); }
-            to { transform: rotate(5deg); }
+            from { transform: rotate(-8deg); }
+            to { transform: rotate(8deg); }
         }
 
         h1 {
             font-family: 'Yuji Syuku', serif;
-            font-size: 4rem;
+            font-size: 5rem;
             color: var(--accent);
-            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
             margin: 0;
-            position: relative;
-            z-index: 1;
+            animation: glow 3s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
+            to { text-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
         }
 
         p.subtitle {
             font-size: 1.2rem;
             margin-top: 10px;
-            letter-spacing: 0.3em;
+            letter-spacing: 0.5em;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards 1s;
         }
 
-        /* メインコンテンツ */
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* グリッドとカード */
         .container {
             max-width: 1200px;
             margin: 50px auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            gap: 40px;
         }
 
         .card {
-            background: #2a2a2a;
-            border: 2px solid var(--accent);
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid var(--accent);
             border-radius: 10px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
-            position: relative;
+            backdrop-filter: blur(5px);
+            
+            /* 初期状態：隠しておく */
+            opacity: 0;
+            transform: translateY(50px);
+            /* アニメーション定義（JSでdelayをつける） */
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        @keyframes cardEntrance {
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.2);
+            border-color: #fff;
         }
 
         .card-img {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
-            filter: sepia(30%);
-            transition: filter 0.3s;
+            filter: sepia(40%) contrast(1.2);
+            transition: filter 0.5s;
         }
 
         .card:hover .card-img {
-            filter: sepia(0%);
+            filter: sepia(0%) contrast(1.1);
         }
 
         .card-content {
-            padding: 20px;
+            padding: 25px;
             text-align: center;
         }
 
-        .card h2 {
-            font-family: 'Yuji Syuku', serif;
-            color: var(--accent);
-            margin: 0 0 10px 0;
-        }
-
-        .card p {
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-        
         .tag {
             display: inline-block;
             background: var(--primary);
             color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 0.8rem;
-            margin-bottom: 10px;
-        }
-
-        .loading {
-            text-align: center;
-            font-size: 2rem;
-            color: var(--accent);
-            padding: 50px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
     </style>
 </head>
 <body>
 
+    <!-- 蛍エフェクト -->
+    <div id="fireflies"></div>
+
     <div class="header">
         <div class="lanterns">
-            <div class="lantern" style="animation-delay: 0s;"></div>
-            <div class="lantern" style="animation-delay: 1s;"></div>
-            <div class="lantern" style="animation-delay: 0.5s;"></div>
-            <div class="lantern" style="animation-delay: 1.5s;"></div>
+            <div class="lantern" style="animation-delay: 0s; animation-duration: 3.5s;"></div>
+            <div class="lantern" style="animation-delay: 1s; animation-duration: 4.2s;"></div>
+            <div class="lantern" style="animation-delay: 0.5s; animation-duration: 3.8s;"></div>
+            <div class="lantern" style="animation-delay: 1.5s; animation-duration: 4.5s;"></div>
         </div>
         <h1>台湾探索</h1>
         <p class="subtitle">伝統と混沌が交差する修学旅行のしおり</p>
@@ -187,39 +221,62 @@
 
     <div class="container">
         <div id="spot-grid" class="grid">
-            <div class="loading">データを読み込み中...</div>
+            <div style="text-align:center; width:100%; color:#888;">データを読み込んでいます...</div>
         </div>
     </div>
 
     <script>
+        // 蛍を生成する関数
+        function createFireflies() {
+            const container = document.getElementById('fireflies');
+            const fireflyCount = 20; // 蛍の数
+
+            for (let i = 0; i < fireflyCount; i++) {
+                const fly = document.createElement('div');
+                fly.classList.add('firefly');
+                
+                // ランダムな位置とサイズ、遅延を設定
+                const size = Math.random() * 6 + 2 + 'px';
+                fly.style.width = size;
+                fly.style.height = size;
+                fly.style.left = Math.random() * 100 + 'vw';
+                fly.style.animationDuration = (Math.random() * 10 + 10) + 's'; // 10~20秒
+                fly.style.animationDelay = (Math.random() * 5) + 's';
+                
+                container.appendChild(fly);
+            }
+        }
+
         async function loadCSV() {
             try {
                 const response = await fetch('spots.csv');
                 const data = await response.text();
-                const rows = data.split('\n').slice(1); // ヘッダー除去
+                const rows = data.split('\n').slice(1);
                 const grid = document.getElementById('spot-grid');
                 grid.innerHTML = '';
 
-                rows.forEach(row => {
+                rows.forEach((row, index) => {
                     if (!row.trim()) return;
-                    // 簡易的なCSVパース（カンマ区切り、引用符なし前提）
-                    // 実際の運用ではライブラリ(PapaParse等)推奨
-                    const cols = row.split(',');
-                    const id = cols[0];
-                    const name = cols[1];
-                    const category = cols[2];
-                    const catchphrase = cols[3];
-                    const photo = cols[7] || 'https://via.placeholder.com/300';
+                    // 簡易パース
+                    const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || row.split(',');
+                    const id = cols[0].replace(/"/g, ''); // クォート除去
+                    const name = cols[1].replace(/"/g, '');
+                    const category = cols[2].replace(/"/g, '');
+                    const catchphrase = cols[3].replace(/"/g, '');
+                    const photo = (cols[7] || 'https://via.placeholder.com/300').replace(/"/g, '');
 
                     const card = document.createElement('div');
                     card.className = 'card';
+                    // アニメーションの遅延を設定 (0.1秒ずつずらす)
+                    card.style.animationDelay = `${index * 0.15}s`; 
+
                     card.onclick = () => window.location.href = `detail.html?id=${id}`;
                     card.innerHTML = `
                         <img src="${photo}" class="card-img" alt="${name}">
                         <div class="card-content">
                             <span class="tag">${category}</span>
-                            <h2>${name}</h2>
-                            <p>${catchphrase}</p>
+                            <h2 style="font-family:'Yuji Syuku', serif; color:var(--accent); margin: 0 0 10px;">${name}</h2>
+                            <p style="font-size:0.9rem; line-height:1.6;">${catchphrase}</p>
                         </div>
                     `;
                     grid.appendChild(card);
@@ -230,7 +287,10 @@
             }
         }
 
-        window.onload = loadCSV;
+        window.onload = () => {
+            createFireflies();
+            loadCSV();
+        };
     </script>
 </body>
 </html>
